@@ -1,0 +1,482 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Oso_app;
+import java.sql.*;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import javax.swing.table.TableColumn;
+
+/**
+ *
+ * @author rizki
+ */
+public class Form_Pesanan extends javax.swing.JFrame {
+    koneksi kon=new koneksi();
+    private Object [][] datasementara=null;
+    private String[]labelsementara={"Id Produk","Jumlah"};
+
+    /**
+     * Creates new form Form_Pesanan
+     */
+    public Form_Pesanan() {
+        initComponents();
+        tid_produk.setEnabled(false);
+        setTanggal();
+        kon.setKoneksi();
+        nonaktif();
+    }
+    
+    public String KodeProduk;
+    
+    public String getKodeProduk() {
+        return KodeProduk;
+    }
+
+    void setTanggal(){
+        java.util.Date skrg = new java.util.Date();
+        java.text.SimpleDateFormat kal = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        ttanggal.setText(kal.format(skrg));
+    }
+    
+    public String getnoPS()
+    {
+        String urutan=null;
+        try{
+            kon.rs=kon.st.executeQuery("select right(id_pesanan,3)+1 from pesanan as Nomor order by id_pesanan desc");
+            if(kon.rs.next())
+            {
+                urutan=kon.rs.getString(1);
+                while(urutan.length()<3)
+                urutan="0"+urutan;
+                urutan="PS-"+urutan;
+            }else
+            {
+                urutan="PS-"+"001";
+            }
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,"No PS Error : "+e);
+        }
+        return urutan;
+    }
+
+    private void BacaTabelSementara(){
+        try{
+            String sql="Select *From sementara order by id_produk";
+            kon.rs=kon.st.executeQuery(sql);
+            ResultSetMetaData m=kon.rs.getMetaData();
+            int kolom=m.getColumnCount();
+            int baris=0;
+            while(kon.rs.next()){
+                baris=kon.rs.getRow();
+            }
+            datasementara=new Object[baris][kolom];
+            int x=0;
+            kon.rs.beforeFirst();
+            while(kon.rs.next()){
+                datasementara[x][0]=kon.rs.getString("id_produk");
+                datasementara[x][1]=kon.rs.getString("qty");
+                x++;
+            }
+            tblPesanan.setModel(new
+            DefaultTableModel(datasementara,labelsementara));
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    
+    private void SimpanSementara(){
+        try{
+            String sql="insert into sementara values('"+tid_produk.getText()+"','"+tjumlah.getText()+"')";
+            kon.st.executeUpdate(sql);
+            BacaTabelSementara();
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null,e);
+        }
+    }
+
+    private void HapusSementara(){
+        int row=tblPesanan.getSelectedRow();
+        try{
+            String sql="Delete from sementara where id_produk='"+(String)tblPesanan.getValueAt(row,0)+"'";
+            kon.st.executeUpdate(sql);
+            BacaTabelSementara();
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    private void HapusSementara2(){
+        try{
+            String sql="Delete from sementara ";
+            kon.st.executeUpdate(sql);
+            BacaTabelSementara();
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+
+    void simpanPesanan(){
+        try{
+            String sql = "insert into pesanan values('"+tid_pesanan.getText() +"','"+ttanggal.getText()+"')";
+            kon.st.executeUpdate(sql);
+
+            String detail = "insert item_pesanan select '"
+            +tid_pesanan.getText() +"',id_produk,qty from sementara ";
+            kon.st.executeUpdate(detail);
+
+
+            JOptionPane.showMessageDialog(this,"Berhasil disimpan","Informasi", JOptionPane.INFORMATION_MESSAGE);
+        }catch(SQLException e){
+            System.out.println("koneksi gagal"+ e.toString());
+        }
+    }
+
+    private void BersihField(){
+        tid_produk.setText("");
+        tjumlah.setText("");
+    }
+
+    private void aktif(){
+        tid_produk.setEnabled(true);
+        tjumlah.setEnabled(true);
+    }
+
+    private void nonaktif(){
+        ttanggal.setEnabled(false);
+        tid_pesanan.setEnabled(false);
+        tid_produk.setEnabled(false);
+        tjumlah.setEnabled(false);
+        bsimpan.setEnabled(false);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        FORM_PESANAN = new javax.swing.JLabel();
+        Tanggal = new javax.swing.JLabel();
+        ttanggal = new javax.swing.JTextField();
+        Input_Pesanan = new javax.swing.JPanel();
+        Id_Pesanan = new javax.swing.JLabel();
+        Id_Produk = new javax.swing.JLabel();
+        tid_produk = new javax.swing.JTextField();
+        browse = new javax.swing.JButton();
+        Jumlah = new javax.swing.JLabel();
+        tjumlah = new javax.swing.JTextField();
+        ENTER = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblPesanan = new javax.swing.JTable();
+        tkurang = new javax.swing.JButton();
+        tid_pesanan = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        btambah = new javax.swing.JButton();
+        bsimpan = new javax.swing.JButton();
+        bbatal = new javax.swing.JButton();
+        btutup = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        FORM_PESANAN.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        FORM_PESANAN.setText("FORM PESANAN");
+        getContentPane().add(FORM_PESANAN, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 0, -1, -1));
+
+        Tanggal.setText("Tanggal");
+        getContentPane().add(Tanggal, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, -1, -1));
+        getContentPane().add(ttanggal, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, 100, -1));
+
+        Input_Pesanan.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Input Pesanan"));
+
+        Id_Pesanan.setText("Id Pesanan");
+
+        Id_Produk.setText("Id Produk");
+
+        browse.setText("...");
+        browse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                browseActionPerformed(evt);
+            }
+        });
+
+        Jumlah.setText("Jumlah");
+
+        tjumlah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tjumlahActionPerformed(evt);
+            }
+        });
+
+        ENTER.setText("ENTER");
+
+        tblPesanan.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2"
+            }
+        ));
+        jScrollPane1.setViewportView(tblPesanan);
+
+        tkurang.setText("-");
+        tkurang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tkurangActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout Input_PesananLayout = new javax.swing.GroupLayout(Input_Pesanan);
+        Input_Pesanan.setLayout(Input_PesananLayout);
+        Input_PesananLayout.setHorizontalGroup(
+            Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Input_PesananLayout.createSequentialGroup()
+                .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(Input_PesananLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(Id_Pesanan)
+                            .addComponent(Id_Produk)
+                            .addComponent(Jumlah))
+                        .addGap(29, 29, 29)
+                        .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(tid_produk)
+                            .addComponent(tjumlah, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                            .addComponent(tid_pesanan))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(browse, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ENTER)))
+                    .addGroup(Input_PesananLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tkurang)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        Input_PesananLayout.setVerticalGroup(
+            Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(Input_PesananLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Id_Pesanan)
+                    .addComponent(tid_pesanan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Id_Produk)
+                    .addComponent(browse)
+                    .addComponent(tid_produk, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Jumlah)
+                    .addComponent(tjumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ENTER))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(Input_PesananLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tkurang, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(Input_Pesanan, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 350, 260));
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btambah.setText("TAMBAH");
+        btambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btambahActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btambah, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 80, 40));
+
+        bsimpan.setText("SIMPAN");
+        bsimpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bsimpanActionPerformed(evt);
+            }
+        });
+        jPanel1.add(bsimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 80, 40));
+
+        bbatal.setText("BATAL");
+        bbatal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bbatalActionPerformed(evt);
+            }
+        });
+        jPanel1.add(bbatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 10, 80, 40));
+
+        btutup.setText("TUTUP");
+        btutup.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btutupActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btutup, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 10, 80, 40));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 370, 60));
+
+        setBounds(0, 0, 406, 449);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void browseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseActionPerformed
+        // TODO add your handling code here:
+        boolean closable = true;
+        DataProduk dataProduk = new DataProduk(null, closable);
+        dataProduk.pesanan = this;
+        dataProduk.setVisible(true);
+        dataProduk.setResizable(true);
+        tid_produk.setText(KodeProduk);
+    }//GEN-LAST:event_browseActionPerformed
+
+    private void btambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btambahActionPerformed
+        // TODO add your handling code here:
+        aktif();
+        bbatal.setEnabled(true);
+        bsimpan.setEnabled(true);
+        btambah.setEnabled(false);
+        tid_produk.setEnabled(false);
+        tid_pesanan.setText(getnoPS());
+        tid_pesanan.setEnabled(false); 
+    }//GEN-LAST:event_btambahActionPerformed
+
+    private void tjumlahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tjumlahActionPerformed
+        // TODO add your handling code here:
+        try{
+            String sql="select *from sementara where id_produk='"
+            +tid_produk.getText()+ "'";
+            kon.rs=kon.st.executeQuery(sql);
+            if(kon.rs.next())
+            {
+                JOptionPane.showMessageDialog(this,"Kode Sudah Dipilih...","Informasi", 
+                JOptionPane.INFORMATION_MESSAGE);
+                browse.requestFocus();
+                tid_produk.setText("");
+            }
+            else
+            {
+                SimpanSementara();
+                if (JOptionPane.showConfirmDialog(this, "Mau Tambah Barang?",
+                "konfirmasi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    tid_produk.requestFocus();
+                    tid_produk.setText("");
+                    tjumlah.setText("");
+                } else {
+                    BersihField();
+                    bsimpan.requestFocus();
+                    return;
+                }
+            }
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }//GEN-LAST:event_tjumlahActionPerformed
+
+    private void tkurangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tkurangActionPerformed
+        // TODO add your handling code here:
+        HapusSementara();
+    }//GEN-LAST:event_tkurangActionPerformed
+
+    private void bbatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bbatalActionPerformed
+        // TODO add your handling code here:
+        HapusSementara2();
+        bsimpan.setEnabled(false);
+        btambah.setEnabled(true);
+        tid_pesanan.setText("");
+        BersihField();
+        nonaktif();
+    }//GEN-LAST:event_bbatalActionPerformed
+
+    private void bsimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bsimpanActionPerformed
+        // TODO add your handling code here:
+        simpanPesanan();
+        HapusSementara2();
+        bsimpan.setEnabled(false);
+        btambah.setEnabled(true);
+        BersihField();
+        tid_pesanan.setText("");
+        nonaktif();
+    }//GEN-LAST:event_bsimpanActionPerformed
+
+    private void btutupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btutupActionPerformed
+        // TODO add your handling code here:
+        dispose();
+    }//GEN-LAST:event_btutupActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Form_Pesanan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Form_Pesanan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Form_Pesanan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Form_Pesanan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Form_Pesanan().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ENTER;
+    private javax.swing.JLabel FORM_PESANAN;
+    private javax.swing.JLabel Id_Pesanan;
+    private javax.swing.JLabel Id_Produk;
+    private javax.swing.JPanel Input_Pesanan;
+    private javax.swing.JLabel Jumlah;
+    private javax.swing.JLabel Tanggal;
+    private javax.swing.JButton bbatal;
+    private javax.swing.JButton browse;
+    private javax.swing.JButton bsimpan;
+    private javax.swing.JButton btambah;
+    private javax.swing.JButton btutup;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tblPesanan;
+    private javax.swing.JTextField tid_pesanan;
+    private javax.swing.JTextField tid_produk;
+    private javax.swing.JTextField tjumlah;
+    private javax.swing.JButton tkurang;
+    private javax.swing.JTextField ttanggal;
+    // End of variables declaration//GEN-END:variables
+}
